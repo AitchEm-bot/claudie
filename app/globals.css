@@ -331,6 +331,18 @@ body {
   margin-bottom: 0.5em;
 }
 
+/* ===== Dream Content Styles ===== */
+.dream-content p {
+  margin-bottom: 2.5rem;
+  line-height: 2;
+  opacity: 0.85;
+  letter-spacing: 0.01em;
+}
+
+.dream-content p:last-child {
+  margin-bottom: 0;
+}
+
 /* ===== Placeholder Styles ===== */
 input::placeholder,
 textarea::placeholder {

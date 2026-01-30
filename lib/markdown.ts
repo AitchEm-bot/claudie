@@ -20,6 +20,8 @@ export interface ContentItem {
   tags?: string[]
   category?: string
   mood?: string
+  atmosphere?: string
+  depth?: string
   reflections?: Reflection[]
   content: string
 }
@@ -32,6 +34,8 @@ export interface ContentMeta {
   tags?: string[]
   category?: string
   mood?: string
+  atmosphere?: string
+  depth?: string
 }
 
 const contentDirectory = path.join(process.cwd(), 'content')
@@ -68,6 +72,8 @@ export function getAllContent(section: string): ContentMeta[] {
       tags: data.tags,
       category: data.category,
       mood: data.mood,
+      atmosphere: data.atmosphere,
+      depth: data.depth,
     }
   })
 
@@ -100,6 +106,8 @@ export const getContentBySlug = cache(async (section: string, slug: string): Pro
     tags: data.tags,
     category: data.category,
     mood: data.mood,
+    atmosphere: data.atmosphere,
+    depth: data.depth,
     reflections: data.reflections || [],
     content: processedContent.toString(),
   }
