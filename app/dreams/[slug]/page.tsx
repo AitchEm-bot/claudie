@@ -97,7 +97,8 @@ export default async function DreamDetailPage({ params }: PageProps) {
         <ReflectionSection
           title="Resonance"
           reflections={dream.reflections}
-          contentPath={`content/dreams/${slug}.md`}
+          section="dreams"
+          slug={slug}
         />
 
         <nav className="flex flex-col md:flex-row justify-between items-center gap-12 py-20 border-t border-[var(--border-color)]">

@@ -23,6 +23,8 @@ export interface ContentItem {
   atmosphere?: string
   depth?: string
   reflections?: Reflection[]
+  fileName?: string
+  codePreview?: string
   content: string
 }
 
@@ -36,12 +38,39 @@ export interface ContentMeta {
   mood?: string
   atmosphere?: string
   depth?: string
+  fileName?: string
+  codePreview?: string
 }
 
 const contentDirectory = path.join(process.cwd(), 'content')
 
 function getContentDirectory(section: string): string {
   return path.join(contentDirectory, section)
+}
+
+function normalizeDate(date: unknown): string {
+  if (!date) return ''
+  if (date instanceof Date) {
+    return date.toISOString().split('T')[0]
+  }
+  return String(date)
+}
+
+interface RawReflection {
+  author?: unknown
+  date?: unknown
+  text?: unknown
+  reaction?: unknown
+}
+
+function normalizeReflections(reflections: unknown): Reflection[] {
+  if (!Array.isArray(reflections)) return []
+  return reflections.map((r: RawReflection) => ({
+    author: String(r.author || ''),
+    date: normalizeDate(r.date),
+    text: String(r.text || ''),
+    reaction: r.reaction ? String(r.reaction) : undefined,
+  }))
 }
 
 export function getAllSlugs(section: string): string[] {
@@ -67,13 +96,15 @@ export function getAllContent(section: string): ContentMeta[] {
     return {
       slug,
       title: data.title || slug,
-      date: data.date || '',
+      date: normalizeDate(data.date),
       description: data.description,
       tags: data.tags,
       category: data.category,
       mood: data.mood,
       atmosphere: data.atmosphere,
       depth: data.depth,
+      fileName: data.fileName,
+      codePreview: data.codePreview,
     }
   })
 
@@ -101,17 +132,31 @@ export const getContentBySlug = cache(async (section: string, slug: string): Pro
   return {
     slug,
     title: data.title || slug,
-    date: data.date || '',
+    date: normalizeDate(data.date),
     description: data.description,
     tags: data.tags,
     category: data.category,
     mood: data.mood,
     atmosphere: data.atmosphere,
     depth: data.depth,
-    reflections: data.reflections || [],
+    reflections: normalizeReflections(data.reflections),
+    fileName: data.fileName,
+    codePreview: data.codePreview,
     content: processedContent.toString(),
   }
 })
+
+export function getRawContent(section: string, slug: string): string | null {
+  const fullPath = path.join(getContentDirectory(section), `${slug}.md`)
+
+  if (!fs.existsSync(fullPath)) {
+    return null
+  }
+
+  const fileContents = fs.readFileSync(fullPath, 'utf8')
+  const { content } = matter(fileContents)
+  return content
+}
 
 export function formatDate(dateString: string): string {
   if (!dateString) return ''

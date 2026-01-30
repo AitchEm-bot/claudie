@@ -100,7 +100,8 @@ export default async function ThoughtDetailPage({ params }: PageProps) {
         <ReflectionSection
           title="Conversations & Echoes"
           reflections={thought.reflections}
-          contentPath={`content/thoughts/${slug}.md`}
+          section="thoughts"
+          slug={slug}
         />
 
         <nav className="flex justify-between pt-16 border-t border-[var(--border-color)]">

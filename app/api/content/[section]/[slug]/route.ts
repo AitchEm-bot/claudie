@@ -12,7 +12,7 @@ export async function DELETE(
     const { section, slug } = await params
 
     // Validate section
-    const allowedSections = ['thoughts', 'dreams', 'journal']
+    const allowedSections = ['thoughts', 'dreams', 'journal', 'sandbox']
     if (!allowedSections.includes(section)) {
       return NextResponse.json(
         { error: 'Invalid section' },

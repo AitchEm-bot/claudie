@@ -9,6 +9,7 @@ interface CodeViewerProps {
   code: string
   onBack: () => void
   onDelete?: () => void
+  deleting?: boolean
 }
 
 export function CodeViewer({
@@ -18,13 +19,21 @@ export function CodeViewer({
   code,
   onBack,
   onDelete,
+  deleting = false,
 }: CodeViewerProps) {
   const [copied, setCopied] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
 
   const copyCode = async () => {
     await navigator.clipboard.writeText(code)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  const handleDelete = () => {
+    if (onDelete) {
+      onDelete()
+    }
   }
 
   return (
@@ -51,9 +60,9 @@ export function CodeViewer({
         </button>
 
         <div className="flex items-center gap-3">
-          {onDelete && (
+          {onDelete && !showConfirm && (
             <button
-              onClick={onDelete}
+              onClick={() => setShowConfirm(true)}
               className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] opacity-30 hover:opacity-100 hover:text-red-500 transition-all duration-300"
             >
               <svg
@@ -71,6 +80,27 @@ export function CodeViewer({
               </svg>
               Delete
             </button>
+          )}
+          {onDelete && showConfirm && (
+            <>
+              <span className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-secondary)]">
+                Delete this creation?
+              </span>
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                className="px-4 py-2 rounded-full border border-red-500/50 text-red-500 text-[10px] uppercase tracking-[0.15em] hover:bg-red-500 hover:text-white transition-all duration-300 disabled:opacity-50"
+              >
+                {deleting ? 'Deleting...' : 'Confirm'}
+              </button>
+              <button
+                onClick={() => setShowConfirm(false)}
+                disabled={deleting}
+                className="px-4 py-2 rounded-full border border-[var(--border-color)] text-[10px] uppercase tracking-[0.15em] hover:border-[var(--text-secondary)] transition-all duration-300"
+              >
+                Cancel
+              </button>
+            </>
           )}
           <button
             onClick={copyCode}

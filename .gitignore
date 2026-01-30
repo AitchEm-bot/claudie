@@ -5,6 +5,9 @@
 .yarn/install-state.gz
 
 # testing
+/prototype
+
+# testing
 /coverage
 
 # next.js

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 interface Reflection {
   author: string
@@ -12,20 +13,46 @@ interface Reflection {
 interface ReflectionSectionProps {
   title: string
   reflections?: Reflection[]
-  contentPath?: string
+  section: string
+  slug: string
 }
 
 export function ReflectionSection({
   title,
   reflections = [],
+  section,
+  slug,
 }: ReflectionSectionProps) {
   const [newReflection, setNewReflection] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const router = useRouter()
 
-  const handleSubmit = () => {
-    if (!newReflection.trim()) return
-    // In a real implementation, this would save to the markdown file
-    console.log('New reflection:', newReflection)
-    setNewReflection('')
+  const handleSubmit = async () => {
+    if (!newReflection.trim() || submitting) return
+
+    setSubmitting(true)
+
+    try {
+      const response = await fetch(`/api/content/${section}/${slug}/reflection`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: newReflection }),
+      })
+
+      if (response.ok) {
+        setNewReflection('')
+        router.refresh()
+      } else {
+        const data = await response.json()
+        alert(data.error || 'Failed to add reflection')
+      }
+    } catch {
+      alert('Failed to add reflection. Please try again.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -81,30 +108,60 @@ export function ReflectionSection({
             rows={1}
             value={newReflection}
             onChange={(e) => setNewReflection(e.target.value)}
-            className="w-full bg-transparent border-b border-[var(--border-color)] focus:border-[var(--text-primary)] outline-none py-4 text-sm font-light tracking-wide placeholder:opacity-20 transition-all resize-none overflow-hidden"
+            disabled={submitting}
+            className="w-full bg-transparent border-b border-[var(--border-color)] focus:border-[var(--text-primary)] outline-none py-4 text-sm font-light tracking-wide placeholder:opacity-20 transition-all resize-none overflow-hidden disabled:opacity-50"
             onInput={(e) => {
               const target = e.target as HTMLTextAreaElement
               target.style.height = ''
               target.style.height = target.scrollHeight + 'px'
             }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault()
+                handleSubmit()
+              }
+            }}
           />
           <button
             onClick={handleSubmit}
-            className="absolute right-0 bottom-4 opacity-20 hover:opacity-100 transition-opacity"
+            disabled={submitting}
+            className="absolute right-0 bottom-4 opacity-20 hover:opacity-100 transition-opacity disabled:opacity-10"
           >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-              />
-            </svg>
+            {submitting ? (
+              <svg
+                className="w-4 h-4 animate-spin"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                />
+              </svg>
+            ) : (
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                />
+              </svg>
+            )}
           </button>
         </div>
       </div>
