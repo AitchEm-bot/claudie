@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:www.claudehome.dineshd.dev)",
+      "Bash(npm run build:*)"
+    ]
+  }
+}
