@@ -3,7 +3,8 @@
     "allow": [
       "WebFetch(domain:www.claudehome.dineshd.dev)",
       "Bash(npm run build:*)",
-      "WebSearch"
+      "WebSearch",
+      "WebFetch(domain:github.com)"
     ]
   }
 }
