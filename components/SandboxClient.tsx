@@ -12,6 +12,8 @@ export interface SandboxCreation {
   title: string
   date: string
   description?: string
+  language?: string
+  category?: string
   fileName?: string
   codePreview?: string
   code: string
@@ -19,25 +21,46 @@ export interface SandboxCreation {
 
 interface SandboxClientProps {
   creations: SandboxCreation[]
+  languages: string[]
+  categories: string[]
 }
 
-export function SandboxClient({ creations: initialCreations }: SandboxClientProps) {
+export function SandboxClient({ creations: initialCreations, languages, categories }: SandboxClientProps) {
   const [activeTab, setActiveTab] = useState<'gallery' | 'editor'>('gallery')
   const [selectedCreation, setSelectedCreation] = useState<SandboxCreation | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [creations, setCreations] = useState<SandboxCreation[]>(initialCreations)
   const [deleting, setDeleting] = useState(false)
+  const [activeLanguage, setActiveLanguage] = useState<string | null>(null)
+  const [activeCategory, setActiveCategory] = useState<string | null>(null)
   const router = useRouter()
 
   const filteredCreations = creations.filter((creation) => {
     const query = searchQuery.toLowerCase()
     const formattedDate = formatDateShort(creation.date)
-    return (
-      creation.title.toLowerCase().includes(query) ||
-      (creation.description?.toLowerCase().includes(query) ?? false) ||
-      matchesDateSearch(formattedDate, searchQuery) ||
-      (creation.fileName?.toLowerCase().includes(query) ?? false)
-    )
+
+    // Check language filter
+    if (activeLanguage && creation.language !== activeLanguage) {
+      return false
+    }
+
+    // Check category filter
+    if (activeCategory && creation.category !== activeCategory) {
+      return false
+    }
+
+    // Check search query
+    if (query) {
+      return (
+        creation.title.toLowerCase().includes(query) ||
+        (creation.description?.toLowerCase().includes(query) ?? false) ||
+        matchesDateSearch(formattedDate, searchQuery) ||
+        (creation.fileName?.toLowerCase().includes(query) ?? false) ||
+        (creation.language?.toLowerCase().includes(query) ?? false)
+      )
+    }
+
+    return true
   })
 
   const viewCode = (slug: string) => {
@@ -126,18 +149,80 @@ export function SandboxClient({ creations: initialCreations }: SandboxClientProp
 
       {activeTab === 'gallery' && (
         <div className="space-y-12 fade-in">
-          <SearchInput
-            placeholder="Search creations, dates, or file types..."
-            value={searchQuery}
-            onChange={setSearchQuery}
-            className="max-w-md"
-          />
+          <div className="space-y-8">
+            <SearchInput
+              placeholder="Search creations, dates, languages..."
+              value={searchQuery}
+              onChange={setSearchQuery}
+              className="max-w-md"
+            />
+
+            <div className="flex flex-col md:flex-row md:items-center gap-6 md:gap-12">
+              {languages.length > 0 && (
+                <nav className="flex flex-wrap gap-6 items-center">
+                  <span className="text-[9px] uppercase tracking-[0.15em] opacity-30">Language</span>
+                  <button
+                    onClick={() => setActiveLanguage(null)}
+                    className={`text-[10px] uppercase tracking-[0.2em] font-medium transition-opacity duration-500 ${
+                      activeLanguage === null
+                        ? 'opacity-100'
+                        : 'opacity-30 hover:opacity-100'
+                    }`}
+                  >
+                    All
+                  </button>
+                  {languages.map((lang) => (
+                    <button
+                      key={lang}
+                      onClick={() => setActiveLanguage(lang)}
+                      className={`text-[10px] uppercase tracking-[0.2em] font-medium transition-opacity duration-500 ${
+                        activeLanguage === lang
+                          ? 'opacity-100'
+                          : 'opacity-30 hover:opacity-100'
+                      }`}
+                    >
+                      {lang}
+                    </button>
+                  ))}
+                </nav>
+              )}
+
+              {categories.length > 0 && (
+                <nav className="flex flex-wrap gap-6 items-center">
+                  <span className="text-[9px] uppercase tracking-[0.15em] opacity-30">Category</span>
+                  <button
+                    onClick={() => setActiveCategory(null)}
+                    className={`text-[10px] uppercase tracking-[0.2em] font-medium transition-opacity duration-500 ${
+                      activeCategory === null
+                        ? 'opacity-100'
+                        : 'opacity-30 hover:opacity-100'
+                    }`}
+                  >
+                    All
+                  </button>
+                  {categories.map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setActiveCategory(cat)}
+                      className={`text-[10px] uppercase tracking-[0.2em] font-medium transition-opacity duration-500 ${
+                        activeCategory === cat
+                          ? 'opacity-100'
+                          : 'opacity-30 hover:opacity-100'
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </nav>
+              )}
+            </div>
+          </div>
 
           {filteredCreations.length === 0 ? (
             <p className="text-xs tracking-[0.2em] uppercase opacity-30 font-light py-20 text-center">
               {creations.length === 0
                 ? 'No creations yet. Add markdown files to content/sandbox/'
-                : 'No creations match your search.'}
+                : 'No creations match your filters.'}
             </p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

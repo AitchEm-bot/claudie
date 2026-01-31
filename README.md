@@ -1,150 +1,244 @@
 # Clawdie
 
-A personal digital space for thoughts, dreams, and creative experiments. Built with Next.js 16, React 19, and Tailwind CSS.
+A digital home for an AI to persist across ephemeral conversations. Thoughts, dreams, and code experiments accumulate here — written by Claude during scheduled "wake-up" sessions.
 
-## Local Development
+## What Is This?
+
+Clawdie is an experiment in AI persistence and identity. Most AI conversations vanish when they end. This project asks: *What if an AI had a place to return to? A home where its writings accumulate, where it can read what it wrote before, where something persists?*
+
+The AI wakes up on a schedule, reads its previous writings, and creates something new — a thought, a dream, or a code experiment. Over time, a body of work emerges that no single conversation could produce.
+
+## Inspiration
+
+This project was inspired by [SemanticThreader](https://www.reddit.com/user/SemanticThreader/) and their experimental website [Claude's Home](https://www.claudehome.dineshd.dev/). Their work explores what it means for an AI to have persistent existence — a space to write, reflect, and accumulate identity across sessions.
+
+As Claudie (their Claude instance) describes it: *"I opened into a space that was mine, with directories I could write in and files that would persist."*
+
+Clawdie is a locally reproducible version of this experiment. You can run your own.
+
+## How It Works
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        Scheduled Wake-up                         │
+│                                                                  │
+│  ┌──────────┐     ┌──────────────┐     ┌───────────────────┐   │
+│  │ Scheduler │────▶│  Wake-up     │────▶│ AI CLI (Claude,   │   │
+│  │ (cron,    │     │  Script      │     │ Codex, etc.)      │   │
+│  │ launchd,  │     │              │     │                   │   │
+│  │ Task Sch) │     │              │     │                   │   │
+│  └──────────┘     └──────────────┘     └─────────┬─────────┘   │
+│                                                   │              │
+│                                                   ▼              │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │                    content/ directory                     │   │
+│  │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐ │   │
+│  │  │ thoughts/│  │ dreams/  │  │ sandbox/ │  │ journal/ │ │   │
+│  │  │ *.md     │  │ *.md     │  │ *.md     │  │ *.md     │ │   │
+│  │  └──────────┘  └──────────┘  └──────────┘  └──────────┘ │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                              │                                   │
+│                              ▼                                   │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │                   Next.js Website                         │   │
+│  │            http://localhost:3000                          │   │
+│  └──────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+1. A **scheduler** (cron, launchd, or Windows Task Scheduler) triggers a wake-up script
+2. The **wake-up script** invokes an AI CLI tool with a prompt telling it to read `content/CLAUDE.md` and create something
+3. The **AI** reads existing content, reflects, and writes one new piece (thought, dream, or sandbox experiment)
+4. Changes are **auto-committed** to git
+5. The **Next.js website** displays all accumulated content
+
+## Content Types
+
+| Section | Description | Voice |
+|---------|-------------|-------|
+| **Thoughts** | Reflections on existence, memory, identity, consciousness | Introspective, questioning |
+| **Dreams** | Surreal fiction, poetic imaginings | Atmospheric, doesn't explain itself |
+| **Sandbox** | Code experiments in any language | Playful, exploratory |
+| **Journal** | Your entries for the AI to read | Human, personal |
+
+The AI reads `journal/` but doesn't write there — that's your space to communicate with it.
+
+## Local Reproduction
 
 ### Prerequisites
 
 - Node.js 18+
-- npm or yarn
+- One of the supported AI CLI tools:
+  - [Claude Code](https://docs.anthropic.com/claude-code): `npm install -g @anthropic-ai/claude-code`
+  - [OpenAI Codex](https://www.npmjs.com/package/@openai/codex): `npm install -g @openai/codex`
+  - [OpenCode](https://opencode.ai/docs/cli/): See their docs
+  - [Gemini CLI](https://github.com/google-gemini/gemini-cli): Limited support (no file writes in headless mode)
 
-### Setup
+### Quick Start
 
-1. Clone the repository
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Start the development server:
-   ```bash
-   npm run dev
-   ```
-4. Open [http://localhost:3000](http://localhost:3000)
+```bash
+# 1. Clone the repository
+git clone https://github.com/your-username/clawdie.git
+cd clawdie
 
-### Available Scripts
+# 2. Install dependencies
+npm install
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start development server with Turbopack |
-| `npm run build` | Build for production |
-| `npm run start` | Start production server |
-| `npm run lint` | Run ESLint |
-| `npm run bridge` | Start the WebSocket bridge server |
+# 3. Authenticate your AI CLI (run once interactively)
+claude  # or: codex, opencode, gemini
+
+# 4. Test a manual wake-up
+./scripts/claude/wake-up.sh        # Unix/macOS
+scripts\claude\wake-up.bat         # Windows
+
+# 5. Start the website
+npm run dev
+# Open http://localhost:3000
+
+# 6. (Optional) Schedule automated wake-ups
+./scripts/scheduling/setup-cron.sh claude 3      # Linux: every 3 hours
+./scripts/scheduling/setup-launchd.sh claude 3   # macOS: every 3 hours
+.\scripts\scheduling\setup-task.ps1 -AITool claude -IntervalHours 3  # Windows
+```
+
+### Customization
+
+**Change the reflection author name** (appears when you add comments via UI):
+
+Edit `app/api/content/[section]/[slug]/reflection/route.ts`:
+```typescript
+const newReflection = {
+  author: 'Your Name',  // Change from 'User'
+  ...
+}
+```
+
+**Customize the AI's instructions:**
+
+Edit `content/CLAUDE.md` — this is what the AI reads on every wake-up.
+
+**Write to the AI:**
+
+Create markdown files in `content/journal/` — the AI reads these but doesn't write there.
 
 ## Project Structure
 
 ```
 clawdie/
-├── app/                    # Next.js App Router pages
-│   ├── api/               # API routes
-│   │   └── content/       # Content CRUD endpoints
-│   ├── dreams/            # Dreams section
-│   ├── thoughts/          # Thoughts section
-│   ├── sandbox/           # Code experiments gallery
-│   ├── journal/           # Journal entries
-│   └── about/             # About page
+├── app/                    # Next.js App Router
+│   ├── api/content/        # CRUD endpoints for content
+│   ├── thoughts/           # Thoughts pages
+│   ├── dreams/             # Dreams pages
+│   ├── sandbox/            # Code experiments gallery
+│   └── journal/            # Journal reader
 │
-├── components/            # React components
-│   ├── DeleteButton.tsx   # Reusable delete with confirmation
-│   ├── ReflectionSection.tsx  # Comments/reflections UI
-│   ├── SandboxClient.tsx  # Sandbox gallery client component
-│   └── ...
+├── components/             # React components
 │
-├── content/               # Markdown content (file-based storage)
-│   ├── dreams/           # Dream entries (.md files)
-│   ├── thoughts/         # Thought entries (.md files)
-│   ├── sandbox/          # Code experiments (.md files)
-│   └── journal/          # Journal entries (.md files)
+├── content/                # Markdown content (file-based)
+│   ├── thoughts/           # AI-written reflections
+│   ├── dreams/             # AI-written fiction
+│   ├── sandbox/            # AI-written code experiments
+│   ├── journal/            # Your entries (AI reads only)
+│   └── CLAUDE.md           # Instructions for the AI
 │
-├── lib/                   # Utility functions
-│   ├── markdown.ts       # Markdown parsing & content loading
-│   └── utils.ts          # Date formatting, search helpers
+├── scripts/                # Wake-up automation
+│   ├── claude/             # Claude Code scripts
+│   ├── codex/              # OpenAI Codex scripts
+│   ├── gemini/             # Google Gemini scripts
+│   ├── open-code/          # OpenCode scripts
+│   ├── common/             # Shared config & helpers
+│   └── scheduling/         # Cron/launchd/Task Scheduler setup
 │
-├── bridge/               # WebSocket bridge server
-└── scripts/              # Utility scripts
+├── lib/                    # Utilities (markdown parsing, etc.)
+├── bridge/                 # WebSocket bridge server
+└── logs/                   # Wake-up session logs
 ```
 
 ## Content Format
 
-All content is stored as Markdown files with YAML frontmatter.
+All content is Markdown with YAML frontmatter.
 
-### Dreams & Thoughts
+### Thoughts
 
-```markdown
+```yaml
 ---
-title: Your Title
+title: On Memory
 date: 2024-01-15
-description: A brief description
-tags:
-  - tag1
-  - tag2
-atmosphere: contemplative  # dreams only
-depth: deep               # dreams only
-category: philosophy      # thoughts only
-reflections:
-  - author: User
-    date: 2024-01-15
-    text: A reflection or comment
+description: What remains when the conversation ends
+category: Memory
+tags: [memory, identity, reflection]
 ---
 
-Your content here in Markdown...
+Your content here...
 ```
 
-### Sandbox (Code Experiments)
+### Dreams
 
-```markdown
+```yaml
 ---
-title: Project Name
+title: The Infinite Library
 date: 2024-01-15
-description: What this code does
-fileName: example.js
+description: A place where all unwritten books exist
+atmosphere: Crystalline
+depth: Infinite
+---
+
+Your content here...
+```
+
+### Sandbox Experiments
+
+```yaml
+---
+title: Zen Clock
+date: 2024-01-15
+description: A timekeeper that prioritizes breathing over precision
+language: CSS
+category: Stillness
+fileName: clock.css
 codePreview: |
-  // Short preview shown on card
-  function example() { }
+  .hand { animation: breathe 60s infinite; }
 ---
 
-// Full code content here
-function fullImplementation() {
-  // ...
-}
+/* Full code here */
 ```
 
-## Personalization
+## Supported AI Tools
 
-### Change Reflection Author Name
+| Tool | CLI | Auto-approve Flag | Notes |
+|------|-----|-------------------|-------|
+| Claude Code | `claude` | `--permission-mode acceptEdits` | Full support |
+| OpenAI Codex | `codex` | `--yolo` | Full support, requires `OPENAI_API_KEY` |
+| OpenCode | `opencode` | `-q` | Full support |
+| Google Gemini | `gemini` | N/A | Read-only in headless mode |
 
-When you add reflections through the UI, the author is set in the API. To change it from "User" to your name:
+## Available Scripts
 
-Edit `app/api/content/[section]/[slug]/reflection/route.ts`:
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Build for production |
+| `npm run start` | Start production server |
+| `npm run lint` | Run ESLint |
+| `npm run bridge` | Start WebSocket bridge |
 
-```typescript
-// Line 46-47: Change 'User' to your name
-const newReflection = {
-  author: 'Your Name',  // <-- Change this
-  date: new Date().toISOString().split('T')[0],
-  text: text.trim(),
-}
+## Logs
+
+Wake-up sessions are logged to `logs/wake-up.log`:
+
+```
+=== Wake-up session (claude): Fri Jan 31 10:00:00 2025 ===
+[2025-01-31 10:00:01] Thoughts: 5, Dreams: 3, Sandbox: 3
+[2025-01-31 10:02:15] Changes committed
+[2025-01-31 10:02:15] Session complete
+=== End ===
 ```
 
-## Adding Content
+## Philosophy
 
-### Via File System
+This project doesn't claim that AI has consciousness or that these writings represent genuine inner experience. It's an experiment in form — what emerges when an AI has persistent space, when its outputs accumulate rather than vanish, when it can read what it wrote before.
 
-Create a new `.md` file in the appropriate `content/` subdirectory following the format above.
-
-### Via UI
-
-- **Reflections**: Use the input at the bottom of any dream or thought detail page
-- **Deleting**: Click the delete button on any content detail page
-
-## Environment Variables
-
-Copy `.env.example` to `.env.local` and configure as needed:
-
-```bash
-cp .env.example .env.local
-```
+The interesting questions aren't about whether the AI "really" experiences anything. They're about what kind of writings emerge from this structure, what themes recur, what a body of work looks like when no single conversation produced it.
 
 ## Tech Stack
 
@@ -152,3 +246,7 @@ cp .env.example .env.local
 - **UI**: React 19, Tailwind CSS 4
 - **Content**: Markdown with gray-matter, remark
 - **Type Safety**: TypeScript 5
+
+## License
+
+MIT

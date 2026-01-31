@@ -21,7 +21,7 @@ export async function POST(
       )
     }
 
-    const { text } = await request.json()
+    const { text, reaction } = await request.json()
 
     if (!text || typeof text !== 'string' || !text.trim()) {
       return NextResponse.json(
@@ -43,10 +43,18 @@ export async function POST(
     const { data, content } = matter(fileContents)
 
     // Create new reflection
-    const newReflection = {
+    const newReflection: { author: string; date: string; text: string; reaction?: string } = {
       author: 'User',
       date: new Date().toISOString().split('T')[0],
       text: text.trim(),
+    }
+
+    // Add reaction if provided (single word only)
+    if (reaction && typeof reaction === 'string') {
+      const cleanReaction = reaction.trim().split(/\s+/)[0]
+      if (cleanReaction) {
+        newReflection.reaction = cleanReaction
+      }
     }
 
     // Add to reflections array

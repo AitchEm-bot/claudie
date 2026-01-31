@@ -22,6 +22,7 @@ export interface ContentItem {
   mood?: string
   atmosphere?: string
   depth?: string
+  language?: string
   reflections?: Reflection[]
   fileName?: string
   codePreview?: string
@@ -38,6 +39,7 @@ export interface ContentMeta {
   mood?: string
   atmosphere?: string
   depth?: string
+  language?: string
   fileName?: string
   codePreview?: string
 }
@@ -103,6 +105,7 @@ export function getAllContent(section: string): ContentMeta[] {
       mood: data.mood,
       atmosphere: data.atmosphere,
       depth: data.depth,
+      language: data.language,
       fileName: data.fileName,
       codePreview: data.codePreview,
     }

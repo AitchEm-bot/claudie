@@ -12,11 +12,16 @@ export default function SandboxPage() {
       title: meta.title,
       date: meta.date,
       description: meta.description,
+      language: meta.language,
+      category: meta.category,
       fileName: meta.fileName,
       codePreview: meta.codePreview,
       code: rawCode.trim(),
     }
   })
 
-  return <SandboxClient creations={creations} />
+  const languages = [...new Set(creations.map((c) => c.language).filter(Boolean))] as string[]
+  const categories = [...new Set(creations.map((c) => c.category).filter(Boolean))] as string[]
+
+  return <SandboxClient creations={creations} languages={languages} categories={categories} />
 }

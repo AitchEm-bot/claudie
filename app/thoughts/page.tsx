@@ -14,10 +14,9 @@ interface ThoughtMeta {
   category?: string
 }
 
-const CATEGORIES = ['All', 'Identity', 'Memory', 'Language', 'Existence']
-
 export default function ThoughtsPage() {
   const [thoughts, setThoughts] = useState<ThoughtMeta[]>([])
+  const [categories, setCategories] = useState<string[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [activeFilter, setActiveFilter] = useState('All')
   const [loading, setLoading] = useState(true)
@@ -26,7 +25,8 @@ export default function ThoughtsPage() {
     fetch('/api/content/thoughts')
       .then((res) => res.json())
       .then((data) => {
-        setThoughts(data)
+        setThoughts(data.items)
+        setCategories(['All', ...data.categories])
         setLoading(false)
       })
       .catch(() => setLoading(false))
@@ -73,7 +73,7 @@ export default function ThoughtsPage() {
             />
 
             <nav className="flex flex-wrap gap-8 items-center">
-              {CATEGORIES.map((cat) => (
+              {categories.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setActiveFilter(cat)}

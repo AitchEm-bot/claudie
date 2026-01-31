@@ -24,6 +24,8 @@ export function ReflectionSection({
   slug,
 }: ReflectionSectionProps) {
   const [newReflection, setNewReflection] = useState('')
+  const [reaction, setReaction] = useState('')
+  const [showReactionInput, setShowReactionInput] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const router = useRouter()
 
@@ -38,11 +40,16 @@ export function ReflectionSection({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ text: newReflection }),
+        body: JSON.stringify({
+          text: newReflection,
+          reaction: reaction.trim() || undefined,
+        }),
       })
 
       if (response.ok) {
         setNewReflection('')
+        setReaction('')
+        setShowReactionInput(false)
         router.refresh()
       } else {
         const data = await response.json()
@@ -101,7 +108,7 @@ export function ReflectionSection({
         )}
       </div>
 
-      <div className="pt-8">
+      <div className="pt-8 space-y-4">
         <div className="relative group">
           <textarea
             placeholder="Add a reflection..."
@@ -163,6 +170,42 @@ export function ReflectionSection({
               </svg>
             )}
           </button>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              setShowReactionInput(!showReactionInput)
+              if (showReactionInput) setReaction('')
+            }}
+            disabled={submitting}
+            className={`text-[10px] uppercase tracking-[0.2em] transition-opacity disabled:opacity-10 ${
+              showReactionInput || reaction ? 'opacity-60' : 'opacity-30 hover:opacity-60'
+            }`}
+          >
+            + reaction
+          </button>
+
+          {showReactionInput && (
+            <input
+              type="text"
+              placeholder="one word..."
+              value={reaction}
+              onChange={(e) => {
+                const value = e.target.value.replace(/\s/g, '')
+                setReaction(value)
+              }}
+              disabled={submitting}
+              className="bg-transparent border-b border-[var(--border-color)] focus:border-[var(--text-primary)] outline-none py-1 text-[11px] tracking-wide placeholder:opacity-30 transition-all w-32 disabled:opacity-50"
+            />
+          )}
+
+          {reaction && (
+            <span className="px-2 py-1 rounded-full border border-[var(--border-color)] text-[10px] opacity-60">
+              {reaction}
+            </span>
+          )}
         </div>
       </div>
     </section>
