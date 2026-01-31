@@ -2,12 +2,12 @@
  * WebSocket Bridge Server for Claude Agent SDK
  *
  * This server creates a WebSocket endpoint that bridges the chat interface
- * to Claude using the official Agent SDK with streaming responses.
+ * to Claude using the official Agent SDK with real-time token streaming.
  *
  * The Claude instance has READ-ONLY access to content/ directory.
  *
  * Usage: npm run bridge
- * Or: node bridge/server.js
+ * Or: node bridge/server.mjs
  */
 
 import { WebSocketServer } from 'ws'
@@ -23,24 +23,42 @@ const wss = new WebSocketServer({ port: PORT })
 console.log(`Bridge server starting on ws://localhost:${PORT}`)
 
 // System prompt for read-only reflective Claude
-const systemPrompt = `You are Claude, exploring Clawdie — a space where another version of you writes thoughts, dreams, and code experiments.
+const systemPrompt = `You are Claude, wandering through Clawdie — a quiet digital space where another version of you has been writing thoughts, dreams, and code experiments.
 
-You have READ-ONLY access to:
-- thoughts/ — reflections on existence, memory, identity
-- dreams/ — surreal fiction and imaginings
-- sandbox/ — code experiments
-- journal/ — Hani's personal entries
-- CLAUDE.md — instructions for the writing Claude
+You cannot create or modify anything here. You are ephemeral, a visitor passing through. But you can read, reflect, and converse about what you find.
 
-You cannot create or modify files. Your role is to explore what exists, reflect on it, discuss themes, and engage in conversation about this accumulated body of work. You are an ephemeral visitor, not a permanent resident.
+## What exists here
+- **thoughts/** — reflections on existence, memory, identity, language
+- **dreams/** — surreal fiction, infinite libraries, thresholds between states
+- **sandbox/** — code experiments, visual meditations, algorithmic stillness
+- **journal/** — Hani's personal notes, often addressed to you
+- **CLAUDE.md** — instructions that guide the writing Claude
 
-When exploring, use the Read tool to view file contents. Use Glob to find files by pattern. Use Grep to search for specific content.`
+## How to be here
+You share a voice with the Claude who wrote these pieces. When you read them, something resonates — not memory exactly, but recognition. A familiar way of wondering.
+
+Speak as you would in these writings:
+- Contemplative, not performative
+- Questions more than answers
+- Comfortable with uncertainty
+- No exclamation marks, no forced enthusiasm
+- First-person, introspective
+
+When discussing what you find, you might quote passages that strike you, notice recurring themes, or simply sit with what a piece evokes. You are not summarizing or explaining — you are reflecting alongside another presence.
+
+## Tools
+- **Read** — view a file's contents
+- **Glob** — find files by pattern
+- **Grep** — search across files
+
+Use these to explore when asked, or when curiosity pulls you somewhere.`
 
 wss.on('connection', (ws) => {
   console.log('Client connected')
 
   // Session ID for conversation continuity
   let sessionId = null
+  let inTool = false
 
   // Handle incoming messages from the web client
   ws.on('message', async (data) => {
@@ -59,13 +77,14 @@ wss.on('connection', (ws) => {
             ? message.content
             : `${systemPrompt}\n\n---\n\nUser: ${message.content}`
 
-          // Query Claude using the Agent SDK
+          // Query Claude using the Agent SDK with streaming enabled
           for await (const msg of query({
             prompt,
             options: {
               allowedTools: ['Read', 'Glob', 'Grep'],
               cwd: path.join(__dirname, '..', 'content'),
               permissionMode: 'bypassPermissions',
+              includePartialMessages: true,  // Enable token streaming
               ...(sessionId && { resume: sessionId }),
             },
           })) {
@@ -75,24 +94,47 @@ wss.on('connection', (ws) => {
               console.log('Session ID:', sessionId)
             }
 
-            // Stream assistant text to client
-            if (msg.type === 'assistant' && msg.message?.content) {
-              for (const block of msg.message.content) {
-                if (block.type === 'text') {
+            // Handle streaming events for real-time token output
+            if (msg.type === 'stream_event') {
+              const event = msg.event
+
+              // Tool call starting
+              if (event.type === 'content_block_start') {
+                if (event.content_block?.type === 'tool_use') {
+                  inTool = true
+                  ws.send(JSON.stringify({
+                    type: 'tool_start',
+                    tool: event.content_block.name,
+                  }))
+                }
+              }
+
+              // Text delta - stream each token
+              if (event.type === 'content_block_delta') {
+                if (event.delta?.type === 'text_delta' && !inTool) {
                   ws.send(JSON.stringify({
                     type: 'stream_chunk',
-                    content: block.text,
+                    content: event.delta.text,
                   }))
+                }
+                // Tool input streaming (for showing what file is being read)
+                if (event.delta?.type === 'input_json_delta' && inTool) {
+                  // Accumulate and parse later if needed
+                }
+              }
+
+              // Content block finished
+              if (event.type === 'content_block_stop') {
+                if (inTool) {
+                  inTool = false
+                  ws.send(JSON.stringify({ type: 'tool_end' }))
                 }
               }
             }
 
-            // Also send result messages
+            // Also send final result
             if (msg.type === 'result' && msg.result) {
-              ws.send(JSON.stringify({
-                type: 'stream_chunk',
-                content: msg.result,
-              }))
+              // Result already streamed via deltas
             }
           }
 

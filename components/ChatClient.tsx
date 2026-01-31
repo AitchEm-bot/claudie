@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 interface Message {
   id: string
@@ -18,6 +20,7 @@ export function ChatClient() {
   const [status, setStatus] = useState<ConnectionStatus>('disconnected')
   const [isStreaming, setIsStreaming] = useState(false)
   const [isFocused, setIsFocused] = useState(false)
+  const [activeTool, setActiveTool] = useState<{ name: string; input: string } | null>(null)
 
   const wsRef = useRef<WebSocket | null>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
@@ -32,7 +35,7 @@ export function ChatClient() {
 
   useEffect(() => {
     scrollToBottom()
-  }, [messages, scrollToBottom])
+  }, [messages, activeTool, scrollToBottom])
 
   const connect = useCallback(() => {
     if (wsRef.current?.readyState === WebSocket.OPEN) return
@@ -73,44 +76,58 @@ export function ChatClient() {
               streaming: true,
             },
           ])
+        } else if (data.type === 'tool_start') {
+          // Only show live indicator, don't add to messages
+          setActiveTool({ name: data.tool, input: data.input || '' })
+        } else if (data.type === 'tool_end') {
+          setActiveTool(null)
         } else if (data.type === 'stream_chunk' && data.content) {
           currentStreamRef.current += data.content
-          // Update the last message with new content
+          // Update the last assistant message with new content
           setMessages((prev) => {
             const updated = [...prev]
-            const lastIdx = updated.length - 1
-            if (lastIdx >= 0 && updated[lastIdx].streaming) {
-              updated[lastIdx] = {
-                ...updated[lastIdx],
-                content: currentStreamRef.current,
+            // Find the last assistant message that's streaming
+            for (let i = updated.length - 1; i >= 0; i--) {
+              if (updated[i].role === 'assistant' && updated[i].streaming) {
+                updated[i] = {
+                  ...updated[i],
+                  content: currentStreamRef.current,
+                }
+                break
               }
             }
             return updated
           })
         } else if (data.type === 'stream_end') {
           setIsStreaming(false)
+          setActiveTool(null)
           // Mark message as complete
           setMessages((prev) => {
             const updated = [...prev]
-            const lastIdx = updated.length - 1
-            if (lastIdx >= 0 && updated[lastIdx].streaming) {
-              updated[lastIdx] = {
-                ...updated[lastIdx],
-                streaming: false,
+            for (let i = updated.length - 1; i >= 0; i--) {
+              if (updated[i].role === 'assistant' && updated[i].streaming) {
+                updated[i] = {
+                  ...updated[i],
+                  streaming: false,
+                }
+                break
               }
             }
             return updated
           })
         } else if (data.type === 'error') {
           setIsStreaming(false)
+          setActiveTool(null)
           setMessages((prev) => {
             const updated = [...prev]
-            const lastIdx = updated.length - 1
-            if (lastIdx >= 0 && updated[lastIdx].streaming) {
-              updated[lastIdx] = {
-                ...updated[lastIdx],
-                content: updated[lastIdx].content || `Error: ${data.message}`,
-                streaming: false,
+            for (let i = updated.length - 1; i >= 0; i--) {
+              if (updated[i].role === 'assistant' && updated[i].streaming) {
+                updated[i] = {
+                  ...updated[i],
+                  content: updated[i].content || `Error: ${data.message}`,
+                  streaming: false,
+                }
+                break
               }
             }
             return updated
@@ -163,6 +180,15 @@ export function ChatClient() {
     })
   }
 
+  const getToolLabel = (toolName: string) => {
+    const labels: Record<string, string> = {
+      Read: 'Reading',
+      Glob: 'Searching',
+      Grep: 'Searching',
+    }
+    return labels[toolName] || toolName
+  }
+
   const statusColors: Record<ConnectionStatus, string> = {
     connecting: 'bg-yellow-500',
     connected: 'bg-green-500',
@@ -196,7 +222,7 @@ export function ChatClient() {
       </div>
 
       {/* Messages Area */}
-      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto space-y-8 pr-4 -mr-4 scrollbar-thin">
+      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto space-y-6 pr-4 -mr-4 scrollbar-thin">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center space-y-4 fade-in">
             <p className="text-xs tracking-[0.2em] uppercase opacity-20 font-light">
@@ -208,29 +234,82 @@ export function ChatClient() {
           </div>
         ) : (
           messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex flex-col ${message.role === 'user' ? 'items-end' : 'items-start'}`}
-            >
-              <div
-                className={`max-w-[80%] ${
-                  message.role === 'user'
-                    ? 'border border-[var(--border-color)] rounded-lg px-4 py-3'
-                    : ''
-                }`}
-              >
-                <p className="text-sm font-light leading-relaxed whitespace-pre-wrap">
-                  {message.content}
-                  {message.streaming && (
-                    <span className="inline-block w-1.5 h-4 ml-1 bg-[var(--text-primary)] opacity-50 animate-pulse" />
-                  )}
-                </p>
-              </div>
-              <span className="text-[10px] uppercase tracking-[0.3em] opacity-30 mt-2 font-light">
-                {message.role === 'user' ? 'You' : 'Claude'} &middot; {formatTime(message.timestamp)}
-              </span>
+            <div key={message.id}>
+              <div className={`flex flex-col ${message.role === 'user' ? 'items-end' : 'items-start'}`}>
+                  <div
+                    className={`max-w-[80%] ${
+                      message.role === 'user'
+                        ? 'border border-[var(--border-color)] rounded-lg px-4 py-3'
+                        : ''
+                    }`}
+                  >
+                    {message.role === 'user' ? (
+                      <p className="text-sm font-light leading-relaxed whitespace-pre-wrap">
+                        {message.content}
+                      </p>
+                    ) : (
+                      <div className="chat-markdown text-sm font-light leading-relaxed">
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          components={{
+                            p: ({ children }) => <p className="mb-4 last:mb-0">{children}</p>,
+                            h1: ({ children }) => <h1 className="text-xl font-medium mb-3 mt-6 first:mt-0">{children}</h1>,
+                            h2: ({ children }) => <h2 className="text-lg font-medium mb-2 mt-5 first:mt-0">{children}</h2>,
+                            h3: ({ children }) => <h3 className="text-base font-medium mb-2 mt-4 first:mt-0">{children}</h3>,
+                            ul: ({ children }) => <ul className="list-disc list-inside mb-4 space-y-1">{children}</ul>,
+                            ol: ({ children }) => <ol className="list-decimal list-inside mb-4 space-y-1">{children}</ol>,
+                            li: ({ children }) => <li className="ml-2">{children}</li>,
+                            code: ({ className, children }) => {
+                              const isInline = !className
+                              return isInline ? (
+                                <code className="bg-[var(--text-primary)] bg-opacity-10 px-1.5 py-0.5 rounded text-[13px] font-mono">
+                                  {children}
+                                </code>
+                              ) : (
+                                <code className="block bg-[var(--text-primary)] bg-opacity-5 p-4 rounded-lg text-[13px] font-mono overflow-x-auto mb-4">
+                                  {children}
+                                </code>
+                              )
+                            },
+                            pre: ({ children }) => <pre className="mb-4">{children}</pre>,
+                            blockquote: ({ children }) => (
+                              <blockquote className="border-l-2 border-[var(--text-primary)] border-opacity-20 pl-4 italic opacity-80 mb-4">
+                                {children}
+                              </blockquote>
+                            ),
+                            a: ({ href, children }) => (
+                              <a href={href} className="underline underline-offset-2 opacity-80 hover:opacity-100 transition-opacity" target="_blank" rel="noopener noreferrer">
+                                {children}
+                              </a>
+                            ),
+                            strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                            em: ({ children }) => <em className="italic">{children}</em>,
+                          }}
+                        >
+                          {message.content}
+                        </ReactMarkdown>
+                        {message.streaming && (
+                          <span className="inline-block w-1.5 h-4 ml-1 bg-[var(--text-primary)] opacity-50 animate-pulse" />
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  <span className="text-[10px] uppercase tracking-[0.3em] opacity-30 mt-2 font-light">
+                    {message.role === 'user' ? 'You' : 'Claude'} &middot; {formatTime(message.timestamp)}
+                  </span>
+                </div>
             </div>
           ))
+        )}
+
+        {/* Active tool indicator at bottom */}
+        {activeTool && (
+          <div className="flex items-center gap-2 py-2">
+            <div className="w-1 h-1 rounded-full bg-[var(--text-primary)] opacity-30 animate-pulse" />
+            <span className="text-[10px] uppercase tracking-[0.2em] opacity-40 font-light">
+              {getToolLabel(activeTool.name)} {activeTool.input}
+            </span>
+          </div>
         )}
       </div>
 
