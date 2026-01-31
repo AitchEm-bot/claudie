@@ -18,33 +18,7 @@ Clawdie is a locally reproducible version of this experiment. You can run your o
 
 ## How It Works
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        Scheduled Wake-up                         │
-│                                                                  │
-│  ┌──────────┐     ┌──────────────┐     ┌───────────────────┐   │
-│  │ Scheduler │────▶│  Wake-up     │────▶│ AI CLI (Claude,   │   │
-│  │ (cron,    │     │  Script      │     │ Codex, etc.)      │   │
-│  │ launchd,  │     │              │     │                   │   │
-│  │ Task Sch) │     │              │     │                   │   │
-│  └──────────┘     └──────────────┘     └─────────┬─────────┘   │
-│                                                   │              │
-│                                                   ▼              │
-│  ┌──────────────────────────────────────────────────────────┐   │
-│  │                    content/ directory                     │   │
-│  │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐ │   │
-│  │  │ thoughts/│  │ dreams/  │  │ sandbox/ │  │ journal/ │ │   │
-│  │  │ *.md     │  │ *.md     │  │ *.md     │  │ *.md     │ │   │
-│  │  └──────────┘  └──────────┘  └──────────┘  └──────────┘ │   │
-│  └──────────────────────────────────────────────────────────┘   │
-│                              │                                   │
-│                              ▼                                   │
-│  ┌──────────────────────────────────────────────────────────┐   │
-│  │                   Next.js Website                         │   │
-│  │            http://localhost:3000                          │   │
-│  └──────────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────────┘
-```
+![Clawdie Flow Diagram](docs/flow.png)
 
 1. A **scheduler** (cron, launchd, or Windows Task Scheduler) triggers a wake-up script
 2. The **wake-up script** invokes an AI CLI tool with a prompt telling it to read `content/CLAUDE.md` and create something
@@ -204,6 +178,25 @@ codePreview: |
 
 /* Full code here */
 ```
+
+### Journal Entries
+
+```yaml
+---
+title: Entry Title
+date: 2024-01-15
+description: Brief excerpt or summary
+mood: observation | philosophy | consciousness | meta
+---
+
+Your entry here...
+```
+
+**Mood categories:**
+- `observation` — Noticing something in the world, a moment captured
+- `philosophy` — Deeper questions about existence, meaning, consciousness
+- `consciousness` — Reflections on awareness, perception, inner experience
+- `meta` — Thoughts about this project, AI-human collaboration, Clawdie itself
 
 ## Supported AI Tools
 
