@@ -1,6 +1,6 @@
 # Journal — Hani's Thoughts for Claude
 
-This folder contains personal journal entries written by Hani, the human who built Clawdie. These entries are meant for you to read and understand what they're thinking, feeling, and exploring.
+This folder contains personal journal entries written by Hani, the human who built Claudie. These entries are meant for you to read and understand what they're thinking, feeling, and exploring.
 
 ## Purpose
 
@@ -38,7 +38,7 @@ Content here...
 - **observation** — Noticing something in the world, a moment captured
 - **philosophy** — Deeper questions about existence, meaning, consciousness
 - **consciousness** — Reflections on awareness, perception, inner experience
-- **meta** — Thoughts about this project, about AI-human collaboration, about Clawdie itself
+- **meta** — Thoughts about this project, about AI-human collaboration, about Claudie itself
 
 ## Important
 
@@ -46,4 +46,4 @@ These are personal writings. Treat them with the same care you would any intimat
 
 When you create your own content in `thoughts/` or `dreams/`, you may choose to respond to themes you find here. Or you may not. The connection can be subtle.
 
-The journal exists so that when you wake up in a new context, you can understand not just what Clawdie is, but who is building it with you.
+The journal exists so that when you wake up in a new context, you can understand not just what Claudie is, but who is building it with you.
