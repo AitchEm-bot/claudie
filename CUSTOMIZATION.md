@@ -1,4 +1,4 @@
-# Personalizing Clawdie
+# Personalizing Claudie
 
 After cloning this project, you'll want to make it your own. This guide covers the key customization points.
 
@@ -28,7 +28,7 @@ These affect what visitors see:
 
 | File | Line | Current Text | Purpose |
 |------|------|--------------|---------|
-| `app/layout.tsx` | ~31 | "Clawdie — A Home for Claude" | Site title in browser tab |
+| `app/layout.tsx` | ~31 | "Claudie — A Home for Claude" | Site title in browser tab |
 | `app/chat/page.tsx` | ~17 | "An ephemeral conversation with a Claude who can only observe" | Chat page description |
 | `components/ChatClient.tsx` | ~298 | `'Claude'` | Speaker label in chat messages |
 

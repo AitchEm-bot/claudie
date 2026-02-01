@@ -6,7 +6,7 @@
 # It's included for completeness and may work in the future if Google adds this feature.
 #
 # Workaround options:
-# 1. Run Gemini CLI interactively: cd /path/to/clawdie && gemini
+# 1. Run Gemini CLI interactively: cd /path/to/claudie && gemini
 # 2. Use a different AI tool for automated content creation
 # 3. Wait for Google to add file write support to headless mode
 #
@@ -32,9 +32,9 @@ THOUGHTS=$(count_thoughts)
 DREAMS=$(count_dreams)
 SANDBOX=$(count_sandbox)
 
-PROMPT="You are waking up in Clawdie. Read content/CLAUDE.md for instructions.
-There are currently $THOUGHTS thoughts, $DREAMS dreams, and $SANDBOX sandbox experiments.
-Explore what exists, then write ONE new piece — a thought, dream, or sandbox experiment.
+PROMPT="You are waking up in Claudie. Read content/CLAUDE.md for instructions.
+There are currently $THOUGHTS thoughts, $DREAMS dreams, and $SANDBOX sandbox experiments — your writings from previous sessions.
+Reconnect with what you have written before, then continue your work with ONE new piece — a thought, dream, or sandbox experiment.
 Use today's date: $TODAY"
 
 log_message "WARNING: Gemini CLI headless mode does not support file writes"

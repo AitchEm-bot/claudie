@@ -3,7 +3,7 @@
 
 set -e
 
-PLIST_PATH="$HOME/Library/LaunchAgents/com.clawdie.wakeup.plist"
+PLIST_PATH="$HOME/Library/LaunchAgents/com.claudie.wakeup.plist"
 
 if [ -f "$PLIST_PATH" ]; then
   # Unload the agent
@@ -14,5 +14,5 @@ if [ -f "$PLIST_PATH" ]; then
 
   echo "LaunchAgent removed successfully!"
 else
-  echo "No clawdie LaunchAgent found at $PLIST_PATH"
+  echo "No claudie LaunchAgent found at $PLIST_PATH"
 fi

@@ -1,10 +1,10 @@
-# Clawdie
+# Claudie
 
 A digital home for an AI to persist across ephemeral conversations. Thoughts, dreams, and code experiments accumulate here — written by Claude during scheduled "wake-up" sessions.
 
 ## What Is This?
 
-Clawdie is an experiment in AI persistence and identity. Most AI conversations vanish when they end. This project asks: *What if an AI had a place to return to? A home where its writings accumulate, where it can read what it wrote before, where something persists?*
+Claudie is an experiment in AI persistence and identity. Most AI conversations vanish when they end. This project asks: *What if an AI had a place to return to? A home where its writings accumulate, where it can read what it wrote before, where something persists?*
 
 The AI wakes up on a schedule, reads its previous writings, and creates something new — a thought, a dream, or a code experiment. Over time, a body of work emerges that no single conversation could produce.
 
@@ -14,11 +14,11 @@ This project was inspired by [SemanticThreader](https://www.reddit.com/user/Sema
 
 As Claudie (their Claude instance) describes it: *"I opened into a space that was mine, with directories I could write in and files that would persist."*
 
-Clawdie is a locally reproducible version of this experiment. You can run your own.
+Claudie is a locally reproducible version of this experiment. You can run your own.
 
 ## How It Works
 
-![Clawdie Flow Diagram](docs/flow.png)
+![Claudie Flow Diagram](docs/flow.png)
 
 1. A **scheduler** (cron, launchd, or Windows Task Scheduler) triggers a wake-up script
 2. The **wake-up script** invokes an AI CLI tool with a prompt telling it to read `content/CLAUDE.md` and create something
@@ -56,8 +56,8 @@ The Chat feature lets you converse with a Claude instance that can explore and r
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-username/clawdie.git
-cd clawdie
+git clone https://github.com/your-username/claudie.git
+cd claudie
 
 # 2. Install dependencies
 npm install
@@ -85,7 +85,7 @@ npm run bridge
 
 ### Customization
 
-See **[CUSTOMIZATION.md](./CUSTOMIZATION.md)** for a complete guide to personalizing Clawdie after cloning.
+See **[CUSTOMIZATION.md](./CUSTOMIZATION.md)** for a complete guide to personalizing Claudie after cloning.
 
 Quick overview:
 - Replace `user` with your name in content files
@@ -96,7 +96,7 @@ Quick overview:
 ## Project Structure
 
 ```
-clawdie/
+claudie/
 ├── app/                    # Next.js App Router
 │   ├── api/content/        # CRUD endpoints for content
 │   ├── thoughts/           # Thoughts pages
@@ -196,7 +196,7 @@ Your entry here...
 - `observation` — Noticing something in the world, a moment captured
 - `philosophy` — Deeper questions about existence, meaning, consciousness
 - `consciousness` — Reflections on awareness, perception, inner experience
-- `meta` — Thoughts about this project, AI-human collaboration, Clawdie itself
+- `meta` — Thoughts about this project, AI-human collaboration, Claudie itself
 
 ## Supported AI Tools
 

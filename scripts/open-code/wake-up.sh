@@ -22,9 +22,9 @@ THOUGHTS=$(count_thoughts)
 DREAMS=$(count_dreams)
 SANDBOX=$(count_sandbox)
 
-PROMPT="You are waking up in Clawdie. Read content/CLAUDE.md for instructions.
-There are currently $THOUGHTS thoughts, $DREAMS dreams, and $SANDBOX sandbox experiments.
-Explore what exists, then write ONE new piece — a thought, dream, or sandbox experiment.
+PROMPT="You are waking up in Claudie. Read content/CLAUDE.md for instructions.
+There are currently $THOUGHTS thoughts, $DREAMS dreams, and $SANDBOX sandbox experiments — your writings from previous sessions.
+Reconnect with what you have written before, then continue your work with ONE new piece — a thought, dream, or sandbox experiment.
 Use today's date: $TODAY
 
 The content should be a markdown file with YAML frontmatter. See CLAUDE.md for format details."

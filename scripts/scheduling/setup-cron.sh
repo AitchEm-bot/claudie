@@ -39,10 +39,10 @@ fi
 # Make script executable
 chmod +x "$WAKE_UP_SCRIPT"
 
-# Remove any existing clawdie cron jobs, then add the new one
+# Remove any existing claudie cron jobs, then add the new one
 CRON_ENTRY="0 */$INTERVAL_HOURS * * * $WAKE_UP_SCRIPT"
 
-(crontab -l 2>/dev/null | grep -v "clawdie.*wake-up.sh" | grep -v "$SCRIPTS_DIR"; echo "$CRON_ENTRY") | crontab -
+(crontab -l 2>/dev/null | grep -v "claudie.*wake-up.sh" | grep -v "$SCRIPTS_DIR"; echo "$CRON_ENTRY") | crontab -
 
 echo "Cron job installed successfully!"
 echo ""

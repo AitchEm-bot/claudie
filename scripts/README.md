@@ -1,4 +1,4 @@
-# Clawdie Scripts
+# Claudie Scripts
 
 Automated wake-up scripts for multiple AI coding assistants with cross-platform scheduling support.
 
@@ -103,7 +103,7 @@ scripts\claude\wake-up.bat
 - **Auto-approve**: N/A - headless mode does not support file writes
 - **Docs**: [Gemini CLI Headless Mode](https://google-gemini.github.io/gemini-cli/docs/cli/headless.html)
 
-**Known Limitation**: Gemini CLI's non-interactive mode (`-p`) does NOT allow WriteFile or shell commands. The scripts are included but will not create content automatically. Use interactive mode instead: `cd /path/to/clawdie && gemini`
+**Known Limitation**: Gemini CLI's non-interactive mode (`-p`) does NOT allow WriteFile or shell commands. The scripts are included but will not create content automatically. Use interactive mode instead: `cd /path/to/claudie && gemini`
 
 ### OpenCode
 

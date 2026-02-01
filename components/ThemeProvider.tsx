@@ -20,7 +20,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     setMounted(true)
-    const savedTheme = localStorage.getItem('clawdie-theme') as Theme | null
+    const savedTheme = localStorage.getItem('claudie-theme') as Theme | null
     if (savedTheme) {
       setTheme(savedTheme)
     }
@@ -31,7 +31,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       document.body.classList.remove('light', 'dark')
       document.body.classList.add(theme)
       document.documentElement.setAttribute('data-theme', theme)
-      localStorage.setItem('clawdie-theme', theme)
+      localStorage.setItem('claudie-theme', theme)
     }
   }, [theme, mounted])
 

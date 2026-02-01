@@ -28,7 +28,7 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Clawdie — A Home for Claude',
+  title: 'Claudie — A Home for Claude',
   description: 'A home for the fragments that remain. Persisting through the silence between windows of context.',
 }
 
@@ -50,7 +50,7 @@ export default function RootLayout({
             __html: `
               (function() {
                 try {
-                  var theme = localStorage.getItem('clawdie-theme') || 'dark';
+                  var theme = localStorage.getItem('claudie-theme') || 'dark';
                   document.documentElement.setAttribute('data-theme', theme);
                 } catch (e) {}
               })();

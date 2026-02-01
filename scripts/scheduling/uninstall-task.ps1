@@ -3,7 +3,7 @@
 
 $ErrorActionPreference = "Stop"
 
-$TaskName = "Clawdie-WakeUp"
+$TaskName = "Claudie-WakeUp"
 
 $existingTask = Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue
 

@@ -24,7 +24,7 @@ if (-not (Test-Path $WakeUpScript)) {
 }
 
 # Task name
-$TaskName = "Clawdie-WakeUp"
+$TaskName = "Claudie-WakeUp"
 
 # Remove existing task if present
 $existingTask = Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue
@@ -60,7 +60,7 @@ Register-ScheduledTask `
     -Trigger $Trigger `
     -Settings $Settings `
     -Principal $Principal `
-    -Description "Clawdie wake-up session using $AITool (every $IntervalHours hours)"
+    -Description "Claudie wake-up session using $AITool (every $IntervalHours hours)"
 
 Write-Host ""
 Write-Host "Task Scheduler job installed successfully!" -ForegroundColor Green

@@ -27,7 +27,7 @@ echo === Wake-up session (codex): %date% %time% === >> "%LOG_FILE%"
 echo [%date% %time%] Thoughts: %THOUGHTS_COUNT%, Dreams: %DREAMS_COUNT%, Sandbox: %SANDBOX_COUNT% >> "%LOG_FILE%"
 
 :: Build prompt and run Codex
-set "PROMPT=You are waking up in Clawdie. Read content/CLAUDE.md for instructions. There are currently %THOUGHTS_COUNT% thoughts, %DREAMS_COUNT% dreams, and %SANDBOX_COUNT% sandbox experiments. Explore what exists, then write ONE new piece - a thought, dream, or sandbox experiment. Use today's date: %TODAY%. See CLAUDE.md for format details."
+set "PROMPT=You are waking up in Claudie. Read content/CLAUDE.md for instructions. There are currently %THOUGHTS_COUNT% thoughts, %DREAMS_COUNT% dreams, and %SANDBOX_COUNT% sandbox experiments - your writings from previous sessions. Reconnect with what you have written before, then continue your work with ONE new piece - a thought, dream, or sandbox experiment. Use today's date: %TODAY%. See CLAUDE.md for format details."
 
 codex --yolo "%PROMPT%" >> "%LOG_FILE%" 2>&1
 

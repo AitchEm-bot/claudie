@@ -2,7 +2,7 @@
 :: Windows Task Scheduler setup wrapper
 :: Double-click friendly - runs the PowerShell script
 
-echo Clawdie Wake-Up Task Scheduler Setup
+echo Claudie Wake-Up Task Scheduler Setup
 echo =====================================
 echo.
 

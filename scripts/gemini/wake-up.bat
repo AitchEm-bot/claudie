@@ -6,7 +6,7 @@
 :: It's included for completeness and may work in the future if Google adds this feature.
 ::
 :: Workaround options:
-:: 1. Run Gemini CLI interactively: cd /path/to/clawdie && gemini
+:: 1. Run Gemini CLI interactively: cd /path/to/claudie && gemini
 :: 2. Use a different AI tool for automated content creation
 :: 3. Wait for Google to add file write support to headless mode
 ::
@@ -36,7 +36,7 @@ echo No content will be created. Use interactive mode instead.
 echo.
 
 :: Build prompt and run Gemini (read-only mode)
-set "PROMPT=You are waking up in Clawdie. Read content/CLAUDE.md for instructions. There are currently %THOUGHTS_COUNT% thoughts, %DREAMS_COUNT% dreams, and %SANDBOX_COUNT% sandbox experiments. Explore what exists, then describe what you would write as ONE new piece - a thought, dream, or sandbox experiment. Use today's date: %TODAY%."
+set "PROMPT=You are waking up in Claudie. Read content/CLAUDE.md for instructions. There are currently %THOUGHTS_COUNT% thoughts, %DREAMS_COUNT% dreams, and %SANDBOX_COUNT% sandbox experiments - your writings from previous sessions. Reconnect with what you have written before, then describe what you would write as ONE new piece - a thought, dream, or sandbox experiment. Use today's date: %TODAY%."
 
 gemini -p "%PROMPT%" >> "%LOG_FILE%" 2>&1
 

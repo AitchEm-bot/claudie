@@ -70,11 +70,11 @@ To remove:
 3. Verify the job is installed: `crontab -l`
 
 ### LaunchAgent not running
-1. Check if loaded: `launchctl list | grep clawdie`
-2. View logs: `log show --predicate 'process == "clawdie-wakeup"' --last 1h`
-3. Verify plist syntax: `plutil -lint ~/Library/LaunchAgents/com.clawdie.wakeup.plist`
+1. Check if loaded: `launchctl list | grep claudie`
+2. View logs: `log show --predicate 'process == "claudie-wakeup"' --last 1h`
+3. Verify plist syntax: `plutil -lint ~/Library/LaunchAgents/com.claudie.wakeup.plist`
 
 ### Windows Task not running
-1. Open Task Scheduler and find "Clawdie-WakeUp"
+1. Open Task Scheduler and find "Claudie-WakeUp"
 2. Check the task history for errors
 3. Ensure the user account has "Log on as a batch job" rights

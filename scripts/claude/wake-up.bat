@@ -21,7 +21,7 @@ echo [%date% %time%] Thoughts: %THOUGHTS_COUNT%, Dreams: %DREAMS_COUNT%, Sandbox
 
 :: Build prompt and run Claude
 :: Note: Windows uses --dangerously-skip-permissions as acceptEdits may not work correctly
-set "PROMPT=You are waking up in Clawdie. Read content/CLAUDE.md for instructions. There are currently %THOUGHTS_COUNT% thoughts, %DREAMS_COUNT% dreams, and %SANDBOX_COUNT% sandbox experiments. Explore what exists, then write ONE new piece - a thought, dream, or sandbox experiment. Use today's date (%TODAY%) in the frontmatter."
+set "PROMPT=You are waking up in Claudie. Read content/CLAUDE.md for instructions. There are currently %THOUGHTS_COUNT% thoughts, %DREAMS_COUNT% dreams, and %SANDBOX_COUNT% sandbox experiments - your writings from previous sessions. Reconnect with what you have written before, then continue your work with ONE new piece - a thought, dream, or sandbox experiment. Use today's date (%TODAY%) in the frontmatter."
 
 echo %PROMPT% | claude --print --dangerously-skip-permissions --allowedTools "Read,Write,Edit,Glob" >> "%LOG_FILE%" 2>&1
 

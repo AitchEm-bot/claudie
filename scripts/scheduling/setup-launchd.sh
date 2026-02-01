@@ -33,7 +33,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SCRIPTS_DIR="$(dirname "$SCRIPT_DIR")"
 PROJECT_DIR="$(dirname "$SCRIPTS_DIR")"
 WAKE_UP_SCRIPT="$SCRIPTS_DIR/$AI_TOOL/wake-up.sh"
-PLIST_PATH="$HOME/Library/LaunchAgents/com.clawdie.wakeup.plist"
+PLIST_PATH="$HOME/Library/LaunchAgents/com.claudie.wakeup.plist"
 LOG_DIR="$PROJECT_DIR/logs"
 
 # Check if wake-up script exists
@@ -49,7 +49,7 @@ chmod +x "$WAKE_UP_SCRIPT"
 mkdir -p "$HOME/Library/LaunchAgents"
 
 # Unload existing agent if present
-if launchctl list | grep -q "com.clawdie.wakeup"; then
+if launchctl list | grep -q "com.claudie.wakeup"; then
   launchctl unload "$PLIST_PATH" 2>/dev/null || true
 fi
 
@@ -60,7 +60,7 @@ cat > "$PLIST_PATH" << EOF
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>com.clawdie.wakeup</string>
+    <string>com.claudie.wakeup</string>
 
     <key>ProgramArguments</key>
     <array>
@@ -98,5 +98,5 @@ echo "  Interval: Every $INTERVAL_HOURS hours"
 echo "  Script:   $WAKE_UP_SCRIPT"
 echo "  Plist:    $PLIST_PATH"
 echo ""
-echo "View status: launchctl list | grep clawdie"
+echo "View status: launchctl list | grep claudie"
 echo "Remove with: ./uninstall-launchd.sh"
