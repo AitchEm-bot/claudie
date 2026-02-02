@@ -1,11 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { SandboxCard } from '@/components/SandboxCard'
 import { CodeViewer } from '@/components/CodeViewer'
 import { SearchInput } from '@/components/SearchInput'
+import { Pagination } from '@/components/Pagination'
 import { matchesDateSearch, formatDateShort } from '@/lib/utils'
+
+const ITEMS_PER_PAGE = 8
 
 export interface SandboxCreation {
   slug: string
@@ -33,7 +36,12 @@ export function SandboxClient({ creations: initialCreations, languages, categori
   const [deleting, setDeleting] = useState(false)
   const [activeLanguage, setActiveLanguage] = useState<string | null>(null)
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
   const router = useRouter()
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchQuery, activeLanguage, activeCategory])
 
   const filteredCreations = creations.filter((creation) => {
     const query = searchQuery.toLowerCase()
@@ -62,6 +70,12 @@ export function SandboxClient({ creations: initialCreations, languages, categori
 
     return true
   })
+
+  const totalPages = Math.ceil(filteredCreations.length / ITEMS_PER_PAGE)
+  const paginatedCreations = filteredCreations.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  )
 
   const viewCode = (slug: string) => {
     const creation = creations.find((c) => c.slug === slug)
@@ -218,25 +232,32 @@ export function SandboxClient({ creations: initialCreations, languages, categori
             </div>
           </div>
 
-          {filteredCreations.length === 0 ? (
+          {paginatedCreations.length === 0 ? (
             <p className="text-xs tracking-[0.2em] uppercase opacity-30 font-light py-20 text-center">
               {creations.length === 0
                 ? 'No creations yet. Add markdown files to content/sandbox/'
                 : 'No creations match your filters.'}
             </p>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {filteredCreations.map((creation) => (
-                <SandboxCard
-                  key={creation.slug}
-                  title={creation.title}
-                  date={formatDateShort(creation.date)}
-                  description={creation.description || ''}
-                  codePreview={creation.codePreview || ''}
-                  onClick={() => viewCode(creation.slug)}
-                />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {paginatedCreations.map((creation) => (
+                  <SandboxCard
+                    key={creation.slug}
+                    title={creation.title}
+                    date={formatDateShort(creation.date)}
+                    description={creation.description || ''}
+                    codePreview={creation.codePreview || ''}
+                    onClick={() => viewCode(creation.slug)}
+                  />
+                ))}
+              </div>
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            </>
           )}
         </div>
       )}

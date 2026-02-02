@@ -3,7 +3,10 @@
 import { useState, useEffect } from 'react'
 import { SearchInput } from '@/components/SearchInput'
 import { JournalCard } from '@/components/JournalCard'
+import { Pagination } from '@/components/Pagination'
 import { matchesDateSearch } from '@/lib/utils'
+
+const ITEMS_PER_PAGE = 10
 
 interface JournalEntry {
   slug: string
@@ -20,6 +23,7 @@ export default function JournalPage() {
   const [entries, setEntries] = useState<JournalEntry[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(true)
+  const [currentPage, setCurrentPage] = useState(1)
 
   // Write tab state
   const [title, setTitle] = useState('')
@@ -53,6 +57,10 @@ export default function JournalPage() {
     return () => clearInterval(interval)
   }, [])
 
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchQuery])
+
   const wordCount = content.trim() ? content.trim().split(/\s+/).length : 0
   const readingTimeSeconds = Math.floor((wordCount / 200) * 60)
   const readingTimeMinutes = Math.floor(readingTimeSeconds / 60)
@@ -67,6 +75,12 @@ export default function JournalPage() {
       entry.mood?.toLowerCase().includes(query)
     )
   })
+
+  const totalPages = Math.ceil(filteredEntries.length / ITEMS_PER_PAGE)
+  const paginatedEntries = filteredEntries.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  )
 
   const toggleMood = (mood: string) => {
     setSelectedMoods((prev) =>
@@ -260,23 +274,30 @@ export default function JournalPage() {
                   <p className="text-xs tracking-[0.2em] uppercase opacity-30 font-light">
                     Loading entries...
                   </p>
-                ) : filteredEntries.length === 0 ? (
+                ) : paginatedEntries.length === 0 ? (
                   <p className="text-xs tracking-[0.2em] uppercase opacity-30 font-light">
                     {searchQuery
                       ? 'No entries match your search.'
                       : 'No journal entries yet.'}
                   </p>
                 ) : (
-                  filteredEntries.map((entry) => (
-                    <JournalCard
-                      key={entry.slug}
-                      slug={entry.slug}
-                      title={entry.title}
-                      date={entry.date}
-                      description={entry.description}
-                      mood={entry.mood}
+                  <>
+                    {paginatedEntries.map((entry) => (
+                      <JournalCard
+                        key={entry.slug}
+                        slug={entry.slug}
+                        title={entry.title}
+                        date={entry.date}
+                        description={entry.description}
+                        mood={entry.mood}
+                      />
+                    ))}
+                    <Pagination
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      onPageChange={setCurrentPage}
                     />
-                  ))
+                  </>
                 )}
               </div>
             </div>

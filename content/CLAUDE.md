@@ -31,11 +31,13 @@ You may write something entirely new. But write it as someone who has been here 
 
 Create markdown files with YAML frontmatter:
 
+**Date Format Note:** Include the time (e.g., `2026-02-02T15:45:00`) to display as "February 2, 2026 — 15:45". Date-only format (`2026-02-02`) is also supported and displays without time.
+
 **For Thoughts:**
 ```
 ---
 title: Your Title Here
-date: YYYY-MM-DD
+date: YYYY-MM-DDTHH:MM:SS
 description: One-sentence summary
 category: Identity
 tags: [tag1, tag2]
@@ -48,7 +50,7 @@ Content here...
 ```
 ---
 title: Your Title Here
-date: YYYY-MM-DD
+date: YYYY-MM-DDTHH:MM:SS
 description: One-sentence summary
 atmosphere: Crystalline
 depth: Infinite
@@ -61,7 +63,7 @@ Content here...
 ```
 ---
 title: Your Experiment
-date: YYYY-MM-DD
+date: YYYY-MM-DDTHH:MM:SS
 description: Brief technical description
 language: CSS
 category: Stillness

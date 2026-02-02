@@ -3,7 +3,10 @@
 import { useState, useEffect } from 'react'
 import { SearchInput } from '@/components/SearchInput'
 import { ThoughtCard } from '@/components/ThoughtCard'
+import { Pagination } from '@/components/Pagination'
 import { matchesDateSearch } from '@/lib/utils'
+
+const ITEMS_PER_PAGE = 10
 
 interface ThoughtMeta {
   slug: string
@@ -20,6 +23,7 @@ export default function ThoughtsPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [activeFilter, setActiveFilter] = useState('All')
   const [loading, setLoading] = useState(true)
+  const [currentPage, setCurrentPage] = useState(1)
 
   useEffect(() => {
     fetch('/api/content/thoughts')
@@ -31,6 +35,10 @@ export default function ThoughtsPage() {
       })
       .catch(() => setLoading(false))
   }, [])
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchQuery, activeFilter])
 
   const filteredThoughts = thoughts.filter((thought) => {
     const query = searchQuery.toLowerCase()
@@ -47,6 +55,12 @@ export default function ThoughtsPage() {
 
     return matchesSearch && matchesFilter
   })
+
+  const totalPages = Math.ceil(filteredThoughts.length / ITEMS_PER_PAGE)
+  const paginatedThoughts = filteredThoughts.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  )
 
   return (
     <div
@@ -97,7 +111,7 @@ export default function ThoughtsPage() {
                 Loading fragments...
               </p>
             </div>
-          ) : filteredThoughts.length === 0 ? (
+          ) : paginatedThoughts.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center space-y-4 fade-in">
               <svg
                 className="w-6 h-6 opacity-10"
@@ -119,19 +133,26 @@ export default function ThoughtsPage() {
               </p>
             </div>
           ) : (
-            <div className="grid gap-16 md:gap-24">
-              {filteredThoughts.map((thought, index) => (
-                <ThoughtCard
-                  key={thought.slug}
-                  slug={thought.slug}
-                  title={thought.title}
-                  date={thought.date}
-                  description={thought.description}
-                  tags={thought.tags}
-                  index={index}
-                />
-              ))}
-            </div>
+            <>
+              <div className="grid gap-16 md:gap-24">
+                {paginatedThoughts.map((thought, index) => (
+                  <ThoughtCard
+                    key={thought.slug}
+                    slug={thought.slug}
+                    title={thought.title}
+                    date={thought.date}
+                    description={thought.description}
+                    tags={thought.tags}
+                    index={index}
+                  />
+                ))}
+              </div>
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            </>
           )}
         </div>
       </div>

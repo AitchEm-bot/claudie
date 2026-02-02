@@ -12,11 +12,21 @@ export function formatDate(dateString: string): string {
   if (!dateString) return ''
 
   const date = new Date(dateString)
-  return date.toLocaleDateString('en-US', {
+  const hasTime = dateString.includes('T')
+
+  const dateFormatted = date.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   })
+
+  if (hasTime) {
+    const hours = String(date.getHours()).padStart(2, '0')
+    const minutes = String(date.getMinutes()).padStart(2, '0')
+    return `${dateFormatted} — ${hours}:${minutes}`
+  }
+
+  return dateFormatted
 }
 
 export function formatDateShort(dateString: string): string {

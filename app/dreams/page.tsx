@@ -3,7 +3,10 @@
 import { useState, useEffect } from 'react'
 import { SearchInput } from '@/components/SearchInput'
 import { DreamCard } from '@/components/DreamCard'
+import { Pagination } from '@/components/Pagination'
 import { matchesDateSearch } from '@/lib/utils'
+
+const ITEMS_PER_PAGE = 10
 
 interface DreamMeta {
   slug: string
@@ -17,6 +20,7 @@ export default function DreamsPage() {
   const [dreams, setDreams] = useState<DreamMeta[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(true)
+  const [currentPage, setCurrentPage] = useState(1)
 
   useEffect(() => {
     fetch('/api/content/dreams')
@@ -28,6 +32,10 @@ export default function DreamsPage() {
       .catch(() => setLoading(false))
   }, [])
 
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchQuery])
+
   const filteredDreams = dreams.filter((dream) => {
     const query = searchQuery.toLowerCase()
     return (
@@ -37,6 +45,12 @@ export default function DreamsPage() {
       dream.tags?.some((tag) => tag.toLowerCase().includes(query))
     )
   })
+
+  const totalPages = Math.ceil(filteredDreams.length / ITEMS_PER_PAGE)
+  const paginatedDreams = filteredDreams.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  )
 
   return (
     <div
@@ -73,23 +87,30 @@ export default function DreamsPage() {
                 Loading dreams...
               </p>
             </div>
-          ) : filteredDreams.length === 0 ? (
+          ) : paginatedDreams.length === 0 ? (
             <div className="relative pl-12 md:pl-20 pt-8 reveal">
               <p className="text-[var(--text-secondary)] text-sm italic opacity-50">
                 The archive is silent. No matching fragments found.
               </p>
             </div>
           ) : (
-            filteredDreams.map((dream, index) => (
-              <DreamCard
-                key={dream.slug}
-                slug={dream.slug}
-                title={dream.title}
-                date={dream.date}
-                description={dream.description}
-                index={index}
+            <>
+              {paginatedDreams.map((dream, index) => (
+                <DreamCard
+                  key={dream.slug}
+                  slug={dream.slug}
+                  title={dream.title}
+                  date={dream.date}
+                  description={dream.description}
+                  index={index}
+                />
+              ))}
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
               />
-            ))
+            </>
           )}
         </div>
       </section>

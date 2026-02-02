@@ -3,8 +3,8 @@ import { notFound } from 'next/navigation'
 import {
   getAllSlugs,
   getContentBySlug,
-  formatDate,
 } from '@/lib/markdown'
+import { formatDate } from '@/lib/utils'
 import { TagChip } from '@/components/TagChip'
 import { DeleteButton } from '@/components/DeleteButton'
 

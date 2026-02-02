@@ -4,8 +4,8 @@ import {
   getAllSlugs,
   getContentBySlug,
   getAdjacentContent,
-  formatDate,
 } from '@/lib/markdown'
+import { formatDate } from '@/lib/utils'
 import { ReflectionSection } from '@/components/ReflectionSection'
 import { DeleteButton } from '@/components/DeleteButton'
 
