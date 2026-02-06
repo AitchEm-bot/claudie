@@ -31,19 +31,19 @@ export async function POST(request: Request) {
 
     // Generate slug and date
     const slug = generateSlug(title)
-    const date = new Date().toISOString().split('T')[0]
+    const date = new Date().toISOString()
 
     // Create description from first ~100 chars of content
     const description = content.slice(0, 100).replace(/\n/g, ' ').trim() + (content.length > 100 ? '...' : '')
 
     // Build frontmatter
-    const moodString = moods && moods.length > 0 ? moods[0] : 'observation'
+    const moodList = moods && moods.length > 0 ? moods : ['observation']
 
     const fileContent = `---
 title: ${title}
-date: ${date}
+date: "${date}"
 description: ${description}
-mood: ${moodString}
+mood: [${moodList.join(', ')}]
 ---
 
 ${content}

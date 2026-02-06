@@ -62,11 +62,11 @@ export default async function JournalDetailPage({ params }: PageProps) {
               <time className="text-[10px] uppercase tracking-[0.3em]">
                 {formatDate(entry.date)}
               </time>
-              {entry.mood && (
+              {entry.mood && entry.mood.length > 0 && (
                 <>
                   <span className="w-1 h-1 rounded-full bg-[var(--text-secondary)]" />
                   <span className="text-[10px] uppercase tracking-[0.3em]">
-                    {entry.mood}
+                    {entry.mood.join(' / ')}
                   </span>
                 </>
               )}
@@ -76,9 +76,11 @@ export default async function JournalDetailPage({ params }: PageProps) {
               {entry.title}
             </h1>
 
-            {entry.mood && (
+            {entry.mood && entry.mood.length > 0 && (
               <div className="flex gap-4">
-                <TagChip tag={entry.mood} />
+                {entry.mood.map((m) => (
+                  <TagChip key={m} tag={m} />
+                ))}
               </div>
             )}
           </header>

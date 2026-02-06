@@ -13,7 +13,7 @@ interface JournalEntry {
   title: string
   date: string
   description?: string
-  mood?: string
+  mood?: string[]
 }
 
 const MOODS = ['observation', 'philosophy', 'consciousness', 'meta']
@@ -72,7 +72,7 @@ export default function JournalPage() {
       entry.title.toLowerCase().includes(query) ||
       entry.description?.toLowerCase().includes(query) ||
       matchesDateSearch(entry.date, searchQuery) ||
-      entry.mood?.toLowerCase().includes(query)
+      entry.mood?.some((m) => m.toLowerCase().includes(query))
     )
   })
 

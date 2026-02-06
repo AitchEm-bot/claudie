@@ -9,7 +9,7 @@ interface JournalCardProps {
   title: string
   date: string
   description?: string
-  mood?: string
+  mood?: string[]
 }
 
 export function JournalCard({
@@ -36,9 +36,11 @@ export function JournalCard({
             </p>
           )}
         </div>
-        {mood && (
+        {mood && mood.length > 0 && (
           <div className="flex gap-4">
-            <TagChip tag={mood} />
+            {mood.map((m) => (
+              <TagChip key={m} tag={m} />
+            ))}
           </div>
         )}
       </div>

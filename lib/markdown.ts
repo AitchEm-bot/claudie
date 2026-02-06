@@ -19,7 +19,7 @@ export interface ContentItem {
   description?: string
   tags?: string[]
   category?: string
-  mood?: string
+  mood?: string[]
   atmosphere?: string
   depth?: string
   language?: string
@@ -36,7 +36,7 @@ export interface ContentMeta {
   description?: string
   tags?: string[]
   category?: string
-  mood?: string
+  mood?: string[]
   atmosphere?: string
   depth?: string
   language?: string
@@ -69,6 +69,12 @@ interface RawReflection {
   date?: unknown
   text?: unknown
   reaction?: unknown
+}
+
+function normalizeMood(mood: unknown): string[] | undefined {
+  if (!mood) return undefined
+  if (Array.isArray(mood)) return mood.map(String)
+  return [String(mood)]
 }
 
 function normalizeReflections(reflections: unknown): Reflection[] {
@@ -108,7 +114,7 @@ export function getAllContent(section: string): ContentMeta[] {
       description: data.description,
       tags: data.tags,
       category: data.category,
-      mood: data.mood,
+      mood: normalizeMood(data.mood),
       atmosphere: data.atmosphere,
       depth: data.depth,
       language: data.language,
@@ -145,7 +151,7 @@ export const getContentBySlug = cache(async (section: string, slug: string): Pro
     description: data.description,
     tags: data.tags,
     category: data.category,
-    mood: data.mood,
+    mood: normalizeMood(data.mood),
     atmosphere: data.atmosphere,
     depth: data.depth,
     reflections: normalizeReflections(data.reflections),
